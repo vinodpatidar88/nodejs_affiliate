@@ -7,8 +7,6 @@ const { executablePath } = require('puppeteer');
 
 const app = express();
 
-puppeteer.use(pluginStealth());
-
 const scrapeAmazonProduct = async (url) => {
     let browser;
     try {
@@ -56,6 +54,7 @@ const scape_myntra = async (url) => {
     try {
         browser = await puppeteer.launch({
             headless: true,
+            executablePath: executablePath(),
             args: [
                 '--disable-web-security',
                 '--disable-features=IsolateOrigins,site-per-process'
@@ -94,6 +93,7 @@ const scape_myntra = async (url) => {
 };
 
 app.get('/scraper_myntra', async (req, res) => {
+    await puppeteer.use(pluginStealth());
     try {
         const browser = await puppeteer.launch({ headless: true, executablePath: executablePath() });
         const page = await browser.newPage();
