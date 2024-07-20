@@ -45,9 +45,51 @@ const scrapeAmazonProduct = async (url) => {
     }
 };
 
+const scape_myntra = async (url) => {
+    let browser;
+    try {
+        browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                '--disable-web-security',
+                '--disable-features=IsolateOrigins,site-per-process'
+            ]
+        });
+        console.log("before : page : ", browser);
+        const page = await browser.newPage();
+        console.log("after : page : ", page);
+
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+
+        console.log(`Navigating to URL: ${url}`);
+
+        await page.screenshot({ path: 'myntra_before_navigation.png' });
+
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 90000 });
+
+        await page.screenshot({ path: 'amazon_after_navigation.png' });
+
+        const productData = await page.evaluate(() => {
+            const title = document.querySelector('.pdp-title')?.innerText.trim();
+
+            return { title };
+        });
+
+        console.log(`Scraped data: ${JSON.stringify(productData)}`);
+        return productData;
+    } catch (error) {
+        console.error(`Error during Puppeteer operation: ${error.message}`);
+        throw error;
+    } finally {
+        if (browser) {
+            await browser.close();
+        }
+    }
+};
+
 app.get('/scraper_myntra', async (req, res) => {
     try {
-        const browser = await puppeteer.launch({headless: true});
+        const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
 
         await page.setExtraHTTPHeaders({
@@ -81,6 +123,23 @@ app.get('/scraper_amazon', async (req, res) => {
 
     try {
         const data = await scrapeAmazonProduct(url);
+        res.status(200).json(data);
+    } catch (error) {
+        console.error(`Error scraping the product: ${error.message}`);
+        res.status(500).send('Error scraping the product');
+    }
+});
+
+app.get('/myntra_scraper', async (req, res) => {
+    const url = req.query.url;
+    console.log(`Received URL: ${url}`);
+
+    if (!url) {
+        return res.status(400).send('URL is required');
+    }
+
+    try {
+        const data = await scape_myntra(url);
         res.status(200).json(data);
     } catch (error) {
         console.error(`Error scraping the product: ${error.message}`);
