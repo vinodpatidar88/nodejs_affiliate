@@ -47,7 +47,7 @@ const scrapeAmazonProduct = async (url) => {
 
 app.get('/scraper_myntra', async (req, res) => {
     try {
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({headless: true});
         const page = await browser.newPage();
 
         await page.setExtraHTTPHeaders({
