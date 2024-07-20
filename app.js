@@ -21,6 +21,8 @@ const scrapeAmazonProduct = async (url) => {
 
 const scrapeMyntraProduct = async (url) => {
     let browser;
+
+    console.log("in function");
     try {
         browser = await puppeteer.launch({
             headless: true,
@@ -29,7 +31,10 @@ const scrapeMyntraProduct = async (url) => {
                 '--disable-features=IsolateOrigins,site-per-process'
             ]
         });
+        console.log("in function browser:", browser);
         const page = await browser.newPage();
+
+        console.log("in function page:", page);
 
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
