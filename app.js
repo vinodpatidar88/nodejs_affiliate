@@ -59,7 +59,10 @@ const scape_myntra = async (url) => {
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
                 '--disable-web-security',
-                '--disable-features=IsolateOrigins,site-per-process'
+                '--disable-features=IsolateOrigins,site-per-process',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--disable-gpu'
             ]
         });
         console.log("before : page : ", browser);
@@ -86,7 +89,8 @@ const scape_myntra = async (url) => {
             // 'Cookie': 'your_cookie_data_here' // If you have cookies for the site
         });
 
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+        const userAgent = new UserAgent();
+        await page.setUserAgent(userAgent.toString());
 
         console.log(`Navigating to URL: ${url}`);
 
