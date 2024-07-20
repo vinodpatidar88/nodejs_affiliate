@@ -1,7 +1,13 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+
+// Add stealth plugin and use defaults 
+const pluginStealth = require('puppeteer-extra-plugin-stealth');
+const { executablePath } = require('puppeteer');
 
 const app = express();
+
+puppeteer.use(pluginStealth());
 
 const scrapeAmazonProduct = async (url) => {
     let browser;
@@ -89,8 +95,18 @@ const scape_myntra = async (url) => {
 
 app.get('/scraper_myntra', async (req, res) => {
     try {
-        const browser = await puppeteer.launch({ headless: true });
+        const browser = await puppeteer.launch({ headless: true, executablePath: executablePath() });
         const page = await browser.newPage();
+
+        // Limit requests 
+        await page.setRequestInterception(true);
+        page.on('request', async (request) => {
+            if (request.resourceType() == 'image') {
+                await request.abort();
+            } else {
+                await request.continue();
+            }
+        });
 
         await page.setExtraHTTPHeaders({
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
