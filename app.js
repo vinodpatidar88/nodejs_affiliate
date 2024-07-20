@@ -25,6 +25,8 @@ const scrapeMyntraProduct = async (url) => {
         browser = await puppeteer.launch({
             headless: true,
             args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
                 '--disable-web-security',
                 '--disable-features=IsolateOrigins,site-per-process'
             ]
@@ -56,14 +58,12 @@ const scrapeMyntraProduct = async (url) => {
 
 app.get('/scraper', async (req, res) => {
     const url = req.query.url;
-
-    // console.log(url);
     if (!url) {
         return res.status(400).send('URL is required');
     }
     try {
+        console.log(url)
         const data = await scrapeMyntraProduct(url);
-        // console.log(data);
         res.status(200).json(data);
     } catch (error) {
         res.status(500).send('Error scraping the product');
@@ -71,11 +71,12 @@ app.get('/scraper', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
+    console.log("status:", res.status(200).send("Affiliate response server."));
     res.status(200).send("Affiliate response server.")
 })
 
 const port = 4040;
 
 app.listen(port, () => {
-    console.log(`Server Running At Por : ${port}...`);
+    console.log(`Server Running At Port : ${port}...`);
 });
