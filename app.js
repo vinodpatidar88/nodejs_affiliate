@@ -39,7 +39,7 @@ const scrapeMyntraProduct = async (url) => {
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
         console.log(`Navigating to URL: ${url}`);
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.goto(url, { waitUntil: 'networkidle2' });
 
         const productData = await page.evaluate(() => {
             const title = document.querySelector('.pdp-title')?.innerText.trim();
