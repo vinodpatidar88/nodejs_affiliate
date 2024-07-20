@@ -54,7 +54,6 @@ const scape_myntra = async (url) => {
     try {
         browser = await puppeteer.launch({
             headless: true,
-            executablePath: executablePath(),
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
@@ -89,14 +88,20 @@ const scape_myntra = async (url) => {
             // 'Cookie': 'your_cookie_data_here' // If you have cookies for the site
         });
 
-        const userAgent = new UserAgent();
-        await page.setUserAgent(userAgent.toString());
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
         console.log(`Navigating to URL: ${url}`);
 
         await page.screenshot({ path: 'myntra_before_navigation.png' });
 
+        await page.mouse.move(100, 100);
+        await page.mouse.move(200, 200);
+
+
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 90000 });
+
+        await page.mouse.move(100, 100);
+        await page.mouse.move(200, 200);
 
         await page.screenshot({ path: 'myntra_after_navigation.png' });
 
