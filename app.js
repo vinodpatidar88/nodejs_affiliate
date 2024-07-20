@@ -1,9 +1,9 @@
 const express = require('express');
 const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const UserAgent = require('user-agents');
 
-// Add stealth plugin and use defaults 
-const pluginStealth = require('puppeteer-extra-plugin-stealth');
-const { executablePath } = require('puppeteer');
+puppeteer.use(StealthPlugin());
 
 const app = express();
 
@@ -93,40 +93,46 @@ const scape_myntra = async (url) => {
 };
 
 app.get('/scraper_myntra', async (req, res) => {
-    await puppeteer.use(pluginStealth());
-    try {
-        const browser = await puppeteer.launch({ headless: true, executablePath: executablePath() });
-        const page = await browser.newPage();
+    const browser = await puppeteer.launch({
+        headless: false, // Sometimes headful mode helps avoid detection
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--disable-gpu'
+        ]
+    });
+    const page = await browser.newPage();
 
-        // Limit requests 
-        await page.setRequestInterception(true);
-        page.on('request', async (request) => {
-            if (request.resourceType() == 'image') {
-                await request.abort();
-            } else {
-                await request.continue();
-            }
-        });
+    // Set a random user agent
+    const userAgent = new UserAgent();
+    await page.setUserAgent(userAgent.toString());
 
-        await page.setExtraHTTPHeaders({
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-            'upgrade-insecure-requests': '1',
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en-US,en;q=0.9,en;q=0.8'
-        });
+    // Set extra HTTP headers
+    await page.setExtraHTTPHeaders({
+        'upgrade-insecure-requests': '1',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'en-US,en;q=0.9,en;q=0.8'
+    });
 
-        await page.setViewport({ width: 1280, height: 720 });
-        await page.goto('https://www.myntra.com/');
-        await page.screenshot({ path: 'image.png', fullPage: true });
+    // Set a random viewport size
+    await page.setViewport({
+        width: Math.floor(Math.random() * (1920 - 1366 + 1)) + 1366,
+        height: Math.floor(Math.random() * (1080 - 768 + 1)) + 768
+    });
 
-        await browser.close();
+    await page.goto('https://www.myntra.com/', { waitUntil: 'networkidle2' });
 
-        res.status(200).send("Affiliate response server.");
-    } catch (error) {
-        console.error("Error occurred during Puppeteer operations:", error);
-        res.status(500).send("An error occurred while processing your request.");
-    }
+    // Perform some actions to mimic user behavior
+    await page.mouse.move(100, 100);
+    await page.mouse.move(200, 200);
+    await page.click('body');
+    await page.screenshot({ path: 'image.png', fullPage: true });
+
+    await browser.close();
+    res.status(200).send("Affiliate response server.")
 });
 
 app.get('/scraper_amazon', async (req, res) => {
