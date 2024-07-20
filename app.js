@@ -94,7 +94,7 @@ const scape_myntra = async (url) => {
 
 app.get('/scraper_myntra', async (req, res) => {
     const browser = await puppeteer.launch({
-        headless: false, // Sometimes headful mode helps avoid detection
+        headless: true, // Sometimes headful mode helps avoid detection
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
