@@ -53,16 +53,16 @@ const scape_myntra = async (url) => {
     let browser;
     try {
         browser = await puppeteer.launch({
-            headless: true,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-web-security',
-                '--disable-features=IsolateOrigins,site-per-process',
-                '--disable-dev-shm-usage',
-                '--disable-accelerated-2d-canvas',
-                '--disable-gpu'
-            ]
+            // headless: true,
+            // args: [
+            //     '--no-sandbox',
+            //     '--disable-setuid-sandbox',
+            //     '--disable-web-security',
+            //     '--disable-features=IsolateOrigins,site-per-process',
+            //     '--disable-dev-shm-usage',
+            //     '--disable-accelerated-2d-canvas',
+            //     '--disable-gpu'
+            // ]
         });
         console.log("before : page : ", browser);
         const page = await browser.newPage();
